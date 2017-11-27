@@ -1,17 +1,12 @@
 'use strict';
-const gets3 = require('./tasks/gets3object.js');
+const getMd5ByS3Object = require('./tasks/gets3object.js');
+var bucketName = 'thorn7plugin';
+var objectKey = 'kid.jpeg';
 
-gets3('thorn7plugin', 'kid.jpeg').then(function(msg) {
+getMd5ByS3Object(bucketName, objectKey).then(function(msg) {
     console.log(msg);
 });
 
-//return Promise
-function getS3ObjectByPath(bucketName, s3ObjectKey) {
-
-}
-
-function md5ByFile() {
-}
 
 function verifyMd5ByHttp() {
 }
