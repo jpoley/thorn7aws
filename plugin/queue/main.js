@@ -1,7 +1,7 @@
 'use strict';
 const gets3 = require('./tasks/gets3object.js');
 
-gets3().then(function(msg) {
+gets3('thorn7plugin', 'kid.jpeg').then(function(msg) {
     console.log(msg);
 });
 
