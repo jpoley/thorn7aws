@@ -1,8 +1,13 @@
-function dequeu() {
-}
+'use strict';
+const gets3 = require('./tasks/gets3object.js');
+
+gets3().then(function(msg) {
+    console.log(msg);
+});
 
 //return Promise
-function getS3ObjectByPath(path) {
+function getS3ObjectByPath(bucketName, s3ObjectKey) {
+
 }
 
 function md5ByFile() {
@@ -15,17 +20,6 @@ function archivedBatdImage() {
 }
 
 
-while (true) {
-    var p1 = dequeu();
-    var p2 = p1.then(function(result) {
-        getS3objectByPath
-    });
-
-
-
-
-    sleep(1);
-}
 
 //while
 
