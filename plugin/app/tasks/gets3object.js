@@ -13,10 +13,11 @@ module.exports= function(bucketName, objectKey) {
                 return reject(err);
             }
 
-            var b = md5sum.digest(data);
-            var hash = b.toString('utf-8');
+            //@see https://gist.github.com/theotow/8577001
+            var md5 = md5sum.update(data.Body).digest('binary');
+            md5 = new Buffer(md5, "binary").toString('base64');
 
-            return fullFill(hash);
+            return fullFill(md5);
         });
     });
 }
