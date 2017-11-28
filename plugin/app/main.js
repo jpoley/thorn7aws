@@ -2,6 +2,8 @@
 const getHashByS3Object = require('./tasks/getHash.js');
 const verifyHash = require('./tasks/verifyHash.js');
 const processFile = require('./tasks/processFile.js');
+const sleep = require('sleep');
+
 
 function process(bucketName, objectKey) {
     getHashByS3Object(bucketName, objectKey)
@@ -23,18 +25,22 @@ function process(bucketName, objectKey) {
 
 
 function main() {
-    //while
-    while(true) {
-        //polling dequeu sqs
-        //if has task
-        // do something
-    }
+    //polling deque sqs
+
+    //if has task
+        //do something
+
+    sleep.sleep(1);
+    main();
 }
 
-//main();
 
 //resolve by sqs
 var bucketName = 'thorn7plugin';
 var objectKey = 'kid.jpeg';
 
 process(bucketName, objectKey);
+
+
+
+//main();
