@@ -1,0 +1,116 @@
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "SQS Queue for hash comparison"
+Parameters: 
+  AlarmEmail: 
+    Default: "bmurphey@gmail.com"
+    Description: "Email address to notify if operational problems arise"
+    Type: "String"
+Resources: 
+  ThornHashComparison: 
+    Type: "AWS::SQS::Queue"
+    Properties: 
+      QueueName: "THORN"
+  AlarmTopic: 
+    Type: "AWS::SNS::Topic"
+    Properties: 
+      Subscription: 
+        - 
+          Endpoint: 
+            Ref: "AlarmEmail"
+          Protocol: "email"
+  QueueDepthAlarm: 
+    Type: "AWS::CloudWatch::Alarm"
+    Properties: 
+      AlarmDescription: "Alarm if queue depth grows beyond 10 messages"
+      Namespace: "AWS/SQS"
+      MetricName: "ApproximateNumberOfMessagesVisible"
+      Dimensions: 
+        - 
+          Name: "THORN"
+          Value: 
+            !GetAtt 
+              - "ThornHashComparison"
+              - "QueueName"
+      Statistic: "Sum"
+      Period: "300"
+      EvaluationPeriods: "1"
+      Threshold: "10"
+      ComparisonOperator: "GreaterThanThreshold"
+      AlarmActions: 
+        - 
+          Ref: "AlarmTopic"
+      InsufficientDataActions: 
+        - 
+          Ref: "AlarmTopic"
+  
+  ThornSnsTopic:
+    Type: "AWS::SNS::Topic"
+    Properties: 
+      Subscription: 
+        - 
+          Endpoint: 
+            !GetAtt
+              - "ThornHashComparison"
+              - "Arn"
+          Protocol: sqs
+      TopicName: ThornHashComparison
+
+  ThornTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: ThornTopicPolicy
+        Statement:
+          - Effect: Allow
+            Principal: "AWS:*"
+            Action:
+              - "sns:Publish"
+      Topics:
+        - Ref: ThornSnsTopic 
+
+  ThornQueuePolicy:
+    Type: "AWS::SQS::QueuePolicy"
+    Properties:        
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: ThornQueuePolicy
+        Statement:
+          - Sid: Allow-SendMessage-From-SNS-Topic
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - "sqs:SendMessage"
+              - "sqs:ReceiveMessage"
+            Resource: "*"
+            #Condition:
+            #  ArnEquals:
+            #    aws:SourceArn:
+            #      Ref: ThornHashComparison
+      Queues:
+        - Ref: ThornHashComparison
+
+Outputs: 
+  QueueURL: 
+    Description: "URL of newly created SQS Queue"
+    Value: 
+      Ref: "ThornHashComparison"
+  QueueARN: 
+    Description: "ARN of newly created SQS Queue"
+    Value: 
+      !GetAtt 
+      - "ThornHashComparison"
+      - "Arn"
+  QueueName: 
+    Description: "Name of newly created SQS Queue"
+    Value: 
+      !GetAtt 
+      - "ThornHashComparison"
+      - "QueueName"
+  rThornSnsTopic:
+    Value:
+      !GetAtt
+      - "ThornSnsTopic"
+      - "TopicName"

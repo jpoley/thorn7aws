@@ -1,0 +1,41 @@
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources: 
+  ThornRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/thorn_plugin/"
+      Policies: 
+        - 
+          PolicyName: "thorn_s3_read"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:ListBucket"
+                Resource: "arn:aws:s3:::thorn7plugin"
+  ThornInstanceProfile: 
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Path: "/thorn_plugin/"
+      Roles: 
+        - 
+          Ref: "ThornRole"
+
+Outputs:
+  rThornInstanceProfile:
+    Value: !Ref ThornInstanceProfile
