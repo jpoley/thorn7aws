@@ -2,8 +2,8 @@
 const getHashByS3Object = require('./tasks/getHash.js');
 const verifyHash = require('./tasks/verifyHash.js');
 const processFile = require('./tasks/processFile.js');
-const sleep = require('sleep');
 
+const SQS_DEQUE_INTERVAL_SEC = 2000;
 
 function process(bucketName, objectKey) {
     getHashByS3Object(bucketName, objectKey)
@@ -30,10 +30,10 @@ function main() {
     //if has task
         //do something
 
-    sleep.sleep(1);
-    main();
+    setTimeout(function() {
+        main();
+    }, SQS_DEQUE_INTERVAL_SEC);
 }
-
 
 //resolve by sqs
 var bucketName = 'thorn7plugin';
