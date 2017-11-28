@@ -1,10 +1,21 @@
+const request = require('request');
+
 module.exports = function(hash) {
     return new Promise(function(fullfill, reject) {
-        const result = {
-            matched: 1,
-            level: "high",
-            provider: "google"
+        //TODO extract env variables
+        const endpoint = 'https://nnkiymcph7.execute-api.us-east-1.amazonaws.com/dev';
+
+        const options = {
+            uri: endpoint + '?hash=' + hash,
         };
-        return fullfill(result);
+
+        request.get(options, function(err, response, body) {
+            if (err) {
+                return reject(err);
+            }
+            console.log(body);
+
+            return fullfill(body);
+        });
     });
 }
