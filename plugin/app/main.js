@@ -1,4 +1,7 @@
 'use strict';
+const AWS = require('aws-sdk');
+const sqs = new AWS.SQS();
+
 const getHashByS3Object = require('./tasks/getHash.js');
 const verifyHash = require('./tasks/verifyHash.js');
 const processFile = require('./tasks/processFile.js');
@@ -19,28 +22,34 @@ function process(bucketName, objectKey) {
 
             return console.log('matched bad file [s3-destPath] => ', result.s3DestPath, '[hash]=>' , result.hash);
         }).catch(function(err) {
-            console.error('failied reason => ', err);
+            return console.error('failied reason => ', err);
         });
 }
 
 
 function main() {
-    //polling deque sqs
+    const Consumer = require('sqs-consumer');
+    const app = Consumer.create({
+        queueUrl: 'https://sqs.us-east-1.amazonaws.com/561275206473/thorn_scale', /* required */
+        handleMessage: (message, done) => {
+            console.log(message);
 
-    //if has task
-        //do something
+            //do some work with `message`
+            var bucketName = 'thorn7plugin';
+            var objectKey = 'kid.jpeg';
 
-    setTimeout(function() {
-        main();
-    }, SQS_DEQUE_INTERVAL_SEC);
+            process(bucketName, objectKey);
+            done();
+        }
+    });
+
+    app.start();
 }
 
-//resolve by sqs
+
 var bucketName = 'thorn7plugin';
 var objectKey = 'kid.jpeg';
-
 process(bucketName, objectKey);
 
-
-
+//TODO switch if production
 //main();
