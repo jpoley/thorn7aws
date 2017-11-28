@@ -9,9 +9,13 @@ function process(bucketName, objectKey) {
             return verifyHash(hash);
             //console.log(hash);
         }).then(function(result) {
-            return processFile(result);
+            return processFile(result, bucketName, objectKey);
         }).then(function(result) {
-            console.log('finished result=> ', result);
+            if (result.matched === false) {
+                return console.log('safe files.');
+            }
+
+            return console.log('matched bad file [s3-destPath] => ', result.s3DestPath, '[hash]=>' , result.hash);
         }).catch(function(err) {
             console.error('failied reason => ', err);
         });

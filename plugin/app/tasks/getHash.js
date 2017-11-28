@@ -13,11 +13,12 @@ module.exports= function(bucketName, objectKey) {
                 return reject(err);
             }
 
+            const binary = data.Body;
             //@see https://gist.github.com/theotow/8577001
-            var md5 = md5sum.update(data.Body).digest('binary');
+            var md5 = md5sum.update(binary).digest('binary');
             md5 = new Buffer(md5, "binary").toString('base64');
 
-            return fullFill(md5);
+            return fullFill({hash: md5, binary: binary});
         });
     });
 }
