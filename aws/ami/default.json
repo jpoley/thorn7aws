@@ -1,0 +1,38 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "aws_region" : "us-east-1",
+    "base_ami" : "ami-da05a4a0",
+    "ssh-private-key" : "/Users/stefletcher/.ssh/sfletcher-thorn.pem",
+    "NVM_VERSION": "v0.33.6",
+    "NODE_VERSION": "7.10"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "{{user `aws_region`}}",
+    "source_ami": "{{user `base_ami`}}",
+    "instance_type": "t2.large",
+    "ssh_username": "ubuntu",
+    "ssh_keypair_name" : "sfletcher-thorn",
+    "ssh_private_key_file" : "{{user `ssh-private-key`}}",
+    "ami_name": "thorn-proxy {{timestamp}}",
+    "subnet_id" : "subnet-79518e56"
+  }],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "../../plugin/app",
+      "destination": "/tmp/thornproxy"
+    },
+    {
+      "type": "shell", 
+      "script": "userdata.sh",
+      "environment_vars": [
+        "NVM_VERSION={{user `NVM_VERSION`}}",
+        "NODE_VERSION={{user `NODE_VERSION`}}"
+      ]
+      }]
+}
