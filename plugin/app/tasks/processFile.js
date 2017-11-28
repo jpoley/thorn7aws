@@ -1,5 +1,4 @@
 const AWS = require('aws-sdk');
-const path = require('path');
 const s3 = new AWS.S3();
 
 const objectPrefix = 'matched/';
@@ -10,8 +9,7 @@ module.exports = function(response, bucketName, sourceObjectKey) {
             return fullfill({matched: false});
         }
 
-        const ext = path.extname(sourceObjectKey);
-        const destPath = objectPrefix + response.hash + ext;
+        const destPath = objectPrefix + sourceObjectKey;
         const params = {
             Bucket: bucketName,
             Key: destPath,
