@@ -1,18 +1,24 @@
 'use strict';
-const getMd5ByS3Object = require('./tasks/gets3object.js');
+const getHashByS3Objecgt = require('./tasks/gets3object.js');
+const verifyHash = require('./tasks/processHash.js');
+const processFile = require('./tasks/processFile.js');
 
 //resolve by sqs
 var bucketName = 'thorn7plugin';
 var objectKey = 'kid.jpeg';
 
-getMd5ByS3Object(bucketName, objectKey).then(function(msg) {
-    console.log(msg);
-});
-
-function verifyMd5ByHttp() {
-}
-
-function archivedImageIfMatched() {
+function process() {
+    getHashByS3Objecgt(bucketName, objectKey)
+        .then(function(hash) {
+            return verifyHash(hash);
+            //console.log(hash);
+        }).then(function(result) {
+            return processFile(result);
+        }).then(function(result) {
+            console.log('finished result=> ', result);
+        }).catch(function(err) {
+            console.error('failied reason => ', err);
+        });
 }
 
 
@@ -20,10 +26,10 @@ function main() {
     //while
     while(true) {
         //polling dequeu sqs
-
         //if has task
         // do something
     }
 }
 
 //main();
+process();
