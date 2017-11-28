@@ -3,11 +3,7 @@ const getHashByS3Objecgt = require('./tasks/gets3object.js');
 const verifyHash = require('./tasks/processHash.js');
 const processFile = require('./tasks/processFile.js');
 
-//resolve by sqs
-var bucketName = 'thorn7plugin';
-var objectKey = 'kid.jpeg';
-
-function process() {
+function process(bucketName, objectKey) {
     getHashByS3Objecgt(bucketName, objectKey)
         .then(function(hash) {
             return verifyHash(hash);
@@ -32,4 +28,9 @@ function main() {
 }
 
 //main();
-process();
+
+//resolve by sqs
+var bucketName = 'thorn7plugin';
+var objectKey = 'kid.jpeg';
+
+process(bucketName, objectKey);
