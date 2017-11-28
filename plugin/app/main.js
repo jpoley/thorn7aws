@@ -1,10 +1,10 @@
 'use strict';
-const getHashByS3Objecgt = require('./tasks/gets3object.js');
+const getHashByS3Object = require('./tasks/getHash.js');
 const verifyHash = require('./tasks/processHash.js');
 const processFile = require('./tasks/processFile.js');
 
 function process(bucketName, objectKey) {
-    getHashByS3Objecgt(bucketName, objectKey)
+    getHashByS3Object(bucketName, objectKey)
         .then(function(hash) {
             return verifyHash(hash);
             //console.log(hash);
