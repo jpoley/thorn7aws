@@ -59,17 +59,19 @@ Resources:
 
   ThornTopicPolicy:
     Type: "AWS::SNS::TopicPolicy"
+    DependsOn: ThornSnsTopic
     Properties:
       PolicyDocument:
         Version: "2012-10-17"
         Id: ThornTopicPolicy
         Statement:
           - Effect: Allow
-            Principal: "AWS:*"
-            Action:
-              - "sns:Publish"
+            Principal:
+              AWS: "*"
+            Action: "sns:Publish"
+            Resource: "*"
       Topics:
-        - Ref: ThornSnsTopic 
+        - !Ref ThornSnsTopic 
 
   ThornQueuePolicy:
     Type: "AWS::SQS::QueuePolicy"
@@ -111,6 +113,4 @@ Outputs:
       - "QueueName"
   rThornSnsTopic:
     Value:
-      !GetAtt
-      - "ThornSnsTopic"
-      - "TopicName"
+      Ref: "ThornSnsTopic"
