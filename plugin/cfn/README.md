@@ -13,7 +13,7 @@ bootstrap.sh PROFILE REGION TEMPLATES_BUCKET
 
 ## Step 2: Upload templates to S3:
 ```
-update_templates.sh P ROFILE REGION TEMPLATES_BUCKET
+update_templates.sh PROFILE REGION TEMPLATES_BUCKET
 ```
 
 ## Step 3: Populate parameters.json
