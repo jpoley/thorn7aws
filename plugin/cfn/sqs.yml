@@ -3,8 +3,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "SQS Queue for hash comparison"
 Parameters: 
-  AlarmEmail: 
-    Default: "bmurphey@gmail.com"
+  pAlarmEmail: 
     Description: "Email address to notify if operational problems arise"
     Type: "String"
 Resources: 
@@ -17,8 +16,8 @@ Resources:
     Properties: 
       Subscription: 
         - 
-          Endpoint: 
-            Ref: "AlarmEmail"
+          Endpoint:
+            Ref: "pAlarmEmail"
           Protocol: "email"
   QueueDepthAlarm: 
     Type: "AWS::CloudWatch::Alarm"
@@ -87,10 +86,6 @@ Resources:
               - "sqs:SendMessage"
               - "sqs:ReceiveMessage"
             Resource: "*"
-            #Condition:
-            #  ArnEquals:
-            #    aws:SourceArn:
-            #      Ref: ThornHashComparison
       Queues:
         - Ref: ThornHashComparison
 

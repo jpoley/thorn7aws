@@ -1,0 +1,34 @@
+[
+  {
+    "ParameterKey": "pThornInstanceType",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pThornKeyPair",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pThornInstanceSubnet",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pThornAMI",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pThornNameTag",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pS3TemplatesBucket",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pAlarmEmail",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "pBucketToMonitor",
+    "ParameterValue": ""
+  }
+]

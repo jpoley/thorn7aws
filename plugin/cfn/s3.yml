@@ -4,12 +4,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   pThornSnsTopic:
     Type: String
+  pBucketToMonitor:
+    Type: String
 Resources:
   ThornS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
-      BucketName: thorn7notificationbucket
+      BucketName: !Ref pBucketToMonitor
       NotificationConfiguration:
         TopicConfigurations:
         - Topic: !Ref pThornSnsTopic

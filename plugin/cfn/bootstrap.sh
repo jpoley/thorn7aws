@@ -1,8 +1,9 @@
 #!/bin/bash
 
-Create S3 bucket
+# Create S3 bucket for CloudFormation templates
 
-BUCKET_NAME="$1"
+PROFILE="$1"
+REGION="$2"
+BUCKET="$3"
 
-
-aws --profile personal_bmurphey --region us-east-1 s3 mb "${BUCKET_NAME}"
+aws --profile "${PROFILE}" --region "${REGION}" s3 mb s3://"${BUCKET}"
