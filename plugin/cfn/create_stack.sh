@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create stack from the templates in the S3 bucket (created with bootstrap.sh)
+
 PROFILE="$1"
 REGION="$2"
 STACK_NAME="$3"

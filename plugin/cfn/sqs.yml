@@ -7,10 +7,12 @@ Parameters:
     Description: "Email address to notify if operational problems arise"
     Type: "String"
 Resources: 
+  # Create an SQS queue for processing PutObject notifications
   ThornHashComparison: 
     Type: "AWS::SQS::Queue"
     Properties: 
       QueueName: "THORN"
+  # Create an SNS topic for queue depth alarms
   AlarmTopic: 
     Type: "AWS::SNS::Topic"
     Properties: 
@@ -19,6 +21,7 @@ Resources:
           Endpoint:
             Ref: "pAlarmEmail"
           Protocol: "email"
+  # Create a queue depth alarm to warn if queue is getting overwhelmed
   QueueDepthAlarm: 
     Type: "AWS::CloudWatch::Alarm"
     Properties: 
@@ -43,7 +46,7 @@ Resources:
       InsufficientDataActions: 
         - 
           Ref: "AlarmTopic"
-  
+  # Create an SNS topic to decouple PutObject notifications from the SQS queue
   ThornSnsTopic:
     Type: "AWS::SNS::Topic"
     Properties: 
@@ -55,7 +58,7 @@ Resources:
               - "Arn"
           Protocol: sqs
       TopicName: ThornHashComparison
-
+  # Apply an SNS topic policy to control publishing to the SNS topic
   ThornTopicPolicy:
     Type: "AWS::SNS::TopicPolicy"
     DependsOn: ThornSnsTopic
@@ -71,7 +74,7 @@ Resources:
             Resource: "*"
       Topics:
         - !Ref ThornSnsTopic 
-
+  # Apply an SQS queue policy to allow SQS queue to publish to SNS topic
   ThornQueuePolicy:
     Type: "AWS::SQS::QueuePolicy"
     Properties:        

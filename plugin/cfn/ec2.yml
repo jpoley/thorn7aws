@@ -15,8 +15,9 @@ Parameters:
     Type: String
   pThornInstanceType:
     Type: String
-Resources: 
-  ImageHashing: 
+Resources:
+  # An EC2 instance to contain the THORN hashing algorithm endpoint
+  ImageHashing:
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: !Ref pThornAMI
