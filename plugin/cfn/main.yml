@@ -1,0 +1,75 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: >
+  CloudFormation template for setting up client plugin for hash matching function and related resources (IAM roles and policies, etc.).
+
+Parameters:
+  pThornInstanceSubnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: The subnet ID to place the THORN EC2 instance in.
+  pThornKeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: The SSH key pair to use with the THORN EC2 instance.
+  pThornAMI: 
+    Type: AWS::EC2::Image::Id
+    Description: The EC2 AMI ID of the THORN EC2 instance.
+  pThornNameTag:
+    Type: String 
+    Description: The "Name" tag of the THORN EC2 instance.
+  pThornInstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Enter EC2 instance type. Default is t2.micro.
+  pS3TemplatesBucket:
+    Type: String
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-.]*[0-9a-zA-Z])*$
+    Description: The S3 bucket where the CloudFormation templates live.
+  pAlarmEmail:
+    Type: String
+    Description: Email address to subscribe to notifications
+  pBucketToMonitor:
+    Type: String
+    Description: Create a bucket to test monitoring
+
+Resources:
+  iam:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${pS3TemplatesBucket}/cfn/iam.yml
+      TimeoutInMinutes: '60'
+  ec2:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: iam
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${pS3TemplatesBucket}/cfn/ec2.yml
+      TimeoutInMinutes: '60'
+      Parameters:
+        pThornInstanceProfile:
+          !GetAtt
+          - iam
+          - Outputs.rThornInstanceProfile
+        pThornInstanceSubnet: !Ref pThornInstanceSubnet
+        pThornKeyPair: !Ref pThornKeyPair
+        pThornAMI: !Ref pThornAMI
+        pThornNameTag: !Ref pThornNameTag
+        pThornInstanceType: !Ref pThornInstanceType
+  sqs:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${pS3TemplatesBucket}/cfn/sqs.yml
+      TimeoutInMinutes: '60'
+      Parameters:
+        pAlarmEmail: !Ref pAlarmEmail
+  s3:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: sqs
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${pS3TemplatesBucket}/cfn/s3.yml
+      TimeoutInMinutes: '60'
+      Parameters:
+        pThornSnsTopic:
+          !GetAtt
+          - sqs
+          - Outputs.rThornSnsTopic
+        pBucketToMonitor: !Ref pBucketToMonitor

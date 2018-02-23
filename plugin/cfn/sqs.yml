@@ -1,0 +1,114 @@
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "SQS Queue for hash comparison"
+Parameters: 
+  pAlarmEmail: 
+    Description: "Email address to notify if operational problems arise"
+    Type: "String"
+Resources: 
+  # Create an SQS queue for processing PutObject notifications
+  ThornHashComparison: 
+    Type: "AWS::SQS::Queue"
+    Properties: 
+      QueueName: "THORN"
+  # Create an SNS topic for queue depth alarms
+  AlarmTopic: 
+    Type: "AWS::SNS::Topic"
+    Properties: 
+      Subscription: 
+        - 
+          Endpoint:
+            Ref: "pAlarmEmail"
+          Protocol: "email"
+  # Create a queue depth alarm to warn if queue is getting overwhelmed
+  QueueDepthAlarm: 
+    Type: "AWS::CloudWatch::Alarm"
+    Properties: 
+      AlarmDescription: "Alarm if queue depth grows beyond 10 messages"
+      Namespace: "AWS/SQS"
+      MetricName: "ApproximateNumberOfMessagesVisible"
+      Dimensions: 
+        - 
+          Name: "THORN"
+          Value: 
+            !GetAtt 
+              - "ThornHashComparison"
+              - "QueueName"
+      Statistic: "Sum"
+      Period: "300"
+      EvaluationPeriods: "1"
+      Threshold: "10"
+      ComparisonOperator: "GreaterThanThreshold"
+      AlarmActions: 
+        - 
+          Ref: "AlarmTopic"
+      InsufficientDataActions: 
+        - 
+          Ref: "AlarmTopic"
+  # Create an SNS topic to decouple PutObject notifications from the SQS queue
+  ThornSnsTopic:
+    Type: "AWS::SNS::Topic"
+    Properties: 
+      Subscription: 
+        - 
+          Endpoint: 
+            !GetAtt
+              - "ThornHashComparison"
+              - "Arn"
+          Protocol: sqs
+      TopicName: ThornHashComparison
+  # Apply an SNS topic policy to control publishing to the SNS topic
+  ThornTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    DependsOn: ThornSnsTopic
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: ThornTopicPolicy
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "*"
+            Action: "sns:Publish"
+            Resource: "*"
+      Topics:
+        - !Ref ThornSnsTopic 
+  # Apply an SQS queue policy to allow SQS queue to publish to SNS topic
+  ThornQueuePolicy:
+    Type: "AWS::SQS::QueuePolicy"
+    Properties:        
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: ThornQueuePolicy
+        Statement:
+          - Sid: Allow-SendMessage-From-SNS-Topic
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - "sqs:SendMessage"
+              - "sqs:ReceiveMessage"
+            Resource: "*"
+      Queues:
+        - Ref: ThornHashComparison
+
+Outputs: 
+  QueueURL: 
+    Description: "URL of newly created SQS Queue"
+    Value: 
+      Ref: "ThornHashComparison"
+  QueueARN: 
+    Description: "ARN of newly created SQS Queue"
+    Value: 
+      !GetAtt 
+      - "ThornHashComparison"
+      - "Arn"
+  QueueName: 
+    Description: "Name of newly created SQS Queue"
+    Value: 
+      !GetAtt 
+      - "ThornHashComparison"
+      - "QueueName"
+  rThornSnsTopic:
+    Value:
+      Ref: "ThornSnsTopic"
